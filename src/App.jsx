@@ -1,7 +1,11 @@
+import Header from "./components/Header";
+import TypingTest from "./components/TypingTest/TypingTest";
+
 function App() {
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center">
-      <h1 className="text-5xl font-bold">kiflo_</h1>
+    <main className="mx-auto flex min-h-screen max-w-6xl flex-col px-8 py-8">
+      <Header />
+      <TypingTest />
     </main>
   );
 }
