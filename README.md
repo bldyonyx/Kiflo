@@ -1,16 +1,56 @@
-# React + Vite
+# Kiflo_
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> find your key flow.  
+> ₊˚⊹⌨ a typing speed test for text & code ⌨⊹˚₊
 
-Currently, two official plugins are available:
+Kiflo is a typing speed test made for practicing
+speed, accuracy, and flow with both text and code. (˶ᵔ ᵕ ᵔ˶)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The name comes from typing *key flow* a little too fast. ♡
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✦ Features
 
-## Expanding the Oxlint configuration
+♡ Practice typing with regular text
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+♡ Type real JavaScript snippets
+
+♡ Choose between 30s, 60s, and 120s tests
+
+♡ Track typing speed, accuracy, and mistakes
+
+♡ Reveal syntax highlighting as you type code
+
+♡ Understand JavaScript snippets after completing them
+
+♡ Adjust text size and spacing
+
+♡ Dyslexia-friendly font option
+
+---
+
+## ✦ Made with
+
+`React` · `JavaScript` · `Tailwind CSS` · `Vite`
+
+---
+
+## ✦ Currently...
+
+Kiflo is still a work in progress! ૮ ˶ᵔ ᵕ ᵔ˶ ა
+
+I'm currently building the typing system,
+working on the text and JavaScript modes,
+and shaping Kiflo's little dark interface.
+
+More modes, stats, and typing features will come
+as I continue building the project ♡
+
+---
+
+<p align="center">
+  find your key flow. ♡
+  <br>
+  kiflo_
+</p>
