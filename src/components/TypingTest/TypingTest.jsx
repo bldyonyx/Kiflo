@@ -1,10 +1,77 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TestControls from "./TestControls";
 import TypingArea from "./TypingArea";
+import Results from "./Results";
+import useTimer from "../../hooks/useTimer";
 
 function TypingTest() {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
+  const [typedText, setTypedText] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
+
+  const {
+    timeLeft,
+    isRunning,
+    elapsedTime,
+    startTimer,
+    stopTimer,
+    resetTimer,
+  } = useTimer(duration);
+
+  const text =
+    mode === "text"
+      ? "the quiet glow from the monitor filled the room while the sound of typing echoed softly through the night."
+      : `const message = "hello, kiflo";`;
+
+  useEffect(() => {
+    setTypedText("");
+    setIsFinished(false);
+    resetTimer();
+  }, [mode, duration]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && typedText.length > 0) {
+      setIsFinished(true);
+    }
+  }, [timeLeft, typedText]);
+
+  const finishTest = () => {
+    if (typedText.length === 0) {
+      return;
+    }
+
+    stopTimer();
+    setIsFinished(true);
+  };
+
+  const restartTest = () => {
+    setTypedText("");
+    setIsFinished(false);
+    resetTimer();
+  };
+
+  const correctCharacters = typedText
+    .split("")
+    .filter(
+      (character, index) => character === text[index]
+    ).length;
+
+  const errors = typedText.length - correctCharacters;
+
+  const accuracy =
+    typedText.length > 0
+      ? Math.round(
+          (correctCharacters / typedText.length) * 100
+        )
+      : 0;
+
+  const minutes = elapsedTime / 60;
+
+  const wpm =
+    minutes > 0
+      ? Math.round(correctCharacters / 5 / minutes)
+      : 0;
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center">
@@ -17,7 +84,25 @@ function TypingTest() {
         />
 
         <div className="min-h-48">
-          <TypingArea mode={mode} />
+          {isFinished ? (
+            <Results
+              wpm={wpm}
+              accuracy={accuracy}
+              errors={errors}
+              elapsedTime={elapsedTime}
+              onRestart={restartTest}
+            />
+          ) : (
+            <TypingArea
+              text={text}
+              typedText={typedText}
+              onTypedTextChange={setTypedText}
+              timeLeft={timeLeft}
+              isRunning={isRunning}
+              onStart={startTimer}
+              onFinish={finishTest}
+            />
+          )}
         </div>
       </div>
     </section>
