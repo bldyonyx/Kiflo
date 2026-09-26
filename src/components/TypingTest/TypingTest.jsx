@@ -3,12 +3,19 @@ import TestControls from "./TestControls";
 import TypingArea from "./TypingArea";
 import Results from "./Results";
 import useTimer from "../../hooks/useTimer";
+import texts from "../../data/texts";
+import javascriptSnippets from "../../data/javascriptSnippets";
+import getRandomItem from "../../utils/getRandomItem";
 
 function TypingTest() {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
   const [typedText, setTypedText] = useState("");
   const [isFinished, setIsFinished] = useState(false);
+
+  const [text, setText] = useState(() =>
+    getRandomItem(texts)
+  );
 
   const {
     timeLeft,
@@ -19,16 +26,27 @@ function TypingTest() {
     resetTimer,
   } = useTimer(duration);
 
-  const text =
-    mode === "text"
-      ? "the quiet glow from the monitor filled the room while the sound of typing echoed softly through the night."
-      : `const message = "hello, kiflo";`;
+  const getContentForMode = (selectedMode) => {
+    const content =
+      selectedMode === "text"
+        ? texts
+        : javascriptSnippets;
+
+    return getRandomItem(content);
+  };
+
+  useEffect(() => {
+    setText(getContentForMode(mode));
+    setTypedText("");
+    setIsFinished(false);
+    resetTimer();
+  }, [mode]);
 
   useEffect(() => {
     setTypedText("");
     setIsFinished(false);
     resetTimer();
-  }, [mode, duration]);
+  }, [duration]);
 
   useEffect(() => {
     if (timeLeft === 0 && typedText.length > 0) {
@@ -46,6 +64,7 @@ function TypingTest() {
   };
 
   const restartTest = () => {
+    setText(getContentForMode(mode));
     setTypedText("");
     setIsFinished(false);
     resetTimer();
