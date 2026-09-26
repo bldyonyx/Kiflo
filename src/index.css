@@ -19,3 +19,23 @@ body {
   background: var(--color-background);
   color: var(--color-text);
 }
+
+@keyframes caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  50%,
+  95% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.typing-caret {
+  animation: caret-blink 1s step-end infinite;
+}
