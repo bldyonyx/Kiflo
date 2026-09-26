@@ -11,16 +11,6 @@ function TypingArea({
 }) {
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-
-        if (typedText.length > 0) {
-          onFinish();
-        }
-
-        return;
-      }
-
       if (timeLeft === 0) {
         return;
       }
@@ -64,7 +54,6 @@ function TypingArea({
     };
   }, [
     text,
-    typedText,
     timeLeft,
     isRunning,
     onStart,
@@ -110,12 +99,6 @@ function TypingArea({
           );
         })}
       </p>
-
-      {typedText.length > 0 && (
-        <p className="mt-6 font-mono text-xs text-subtle">
-          press enter to finish
-        </p>
-      )}
     </div>
   );
 }
