@@ -182,7 +182,7 @@ function TypingArea({
                     className="relative inline-block"
                     aria-hidden="true"
                   >
-                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-[2px] bg-accent" />
+                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5 bg-accent" />
                   </span>
                 )}
 
@@ -198,7 +198,7 @@ function TypingArea({
             >
               {isCurrentCharacter && (
                 <span
-                  className="typing-caret absolute -left-[1px] top-[0.15em] h-[1em] w-[2px] bg-accent"
+                  className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
                   aria-hidden="true"
                 />
               )}
