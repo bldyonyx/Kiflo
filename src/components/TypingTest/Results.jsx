@@ -3,6 +3,8 @@ function Results({
   accuracy,
   mistakes,
   elapsedTime,
+  snippet,
+  onUnderstand,
   onRestart,
 }) {
   return (
@@ -16,6 +18,7 @@ function Results({
           <p className="text-4xl text-accent">
             {wpm}
           </p>
+
           <p className="mt-2 text-sm text-muted">
             wpm
           </p>
@@ -25,6 +28,7 @@ function Results({
           <p className="text-4xl text-text">
             {accuracy}%
           </p>
+
           <p className="mt-2 text-sm text-muted">
             accuracy
           </p>
@@ -34,6 +38,7 @@ function Results({
           <p className="text-4xl text-error">
             {mistakes}
           </p>
+
           <p className="mt-2 text-sm text-muted">
             mistakes
           </p>
@@ -43,6 +48,16 @@ function Results({
       <p className="text-sm text-subtle">
         {elapsedTime.toFixed(1)}s
       </p>
+
+      {snippet && (
+        <button
+          type="button"
+          onClick={onUnderstand}
+          className="text-sm text-accent transition-opacity hover:opacity-70"
+        >
+          {"<>"} understand this code
+        </button>
+      )}
 
       <button
         type="button"

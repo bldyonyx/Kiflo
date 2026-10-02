@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TestControls from "./TestControls";
 import TypingArea from "./TypingArea";
 import Results from "./Results";
+import CodeExplanation from "./CodeExplanation";
 import useTimer from "../../hooks/useTimer";
 import texts from "../../data/texts";
 import javascriptSnippets from "../../data/javascriptSnippets";
@@ -11,13 +12,17 @@ function TypingTest() {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
   const [typedText, setTypedText] = useState("");
-  const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+  const [correctKeystrokes, setCorrectKeystrokes] =
+    useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [showExplanation, setShowExplanation] =
+    useState(false);
 
-  const [text, setText] = useState(() =>
-    getRandomItem(texts)
-  );
+  const [content, setContent] = useState(() => ({
+    mode: "text",
+    value: getRandomItem(texts),
+  }));
 
   const {
     timeLeft,
@@ -29,24 +34,35 @@ function TypingTest() {
   } = useTimer(duration);
 
   const getContentForMode = (selectedMode) => {
-    const content =
-      selectedMode === "text"
-        ? texts
-        : javascriptSnippets;
+    if (selectedMode === "javascript") {
+      return {
+        mode: "javascript",
+        value: getRandomItem(javascriptSnippets),
+      };
+    }
 
-    return getRandomItem(content);
+    return {
+      mode: "text",
+      value: getRandomItem(texts),
+    };
   };
+
+  const text =
+    content.mode === "javascript"
+      ? content.value.code
+      : content.value;
 
   const resetTestState = () => {
     setTypedText("");
     setCorrectKeystrokes(0);
     setMistakes(0);
     setIsFinished(false);
+    setShowExplanation(false);
     resetTimer();
   };
 
   useEffect(() => {
-    setText(getContentForMode(mode));
+    setContent(getContentForMode(mode));
     resetTestState();
   }, [mode]);
 
@@ -70,7 +86,7 @@ function TypingTest() {
   };
 
   const restartTest = () => {
-    setText(getContentForMode(mode));
+    setContent(getContentForMode(mode));
     resetTestState();
   };
 
@@ -82,7 +98,8 @@ function TypingTest() {
     setMistakes((current) => current + 1);
   };
 
-  const totalKeystrokes = correctKeystrokes + mistakes;
+  const totalKeystrokes =
+    correctKeystrokes + mistakes;
 
   const accuracy =
     totalKeystrokes > 0
@@ -95,8 +112,15 @@ function TypingTest() {
 
   const wpm =
     minutes > 0
-      ? Math.round(correctKeystrokes / 5 / minutes)
+      ? Math.round(
+          correctKeystrokes / 5 / minutes
+        )
       : 0;
+
+  const currentSnippet =
+    content.mode === "javascript"
+      ? content.value
+      : null;
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center">
@@ -109,21 +133,33 @@ function TypingTest() {
         />
 
         <div className="min-h-48">
-          {isFinished ? (
+          {showExplanation && currentSnippet ? (
+            <CodeExplanation
+              snippet={currentSnippet}
+              onBack={() => setShowExplanation(false)}
+              onRestart={restartTest}
+            />
+          ) : isFinished ? (
             <Results
               wpm={wpm}
               accuracy={accuracy}
               mistakes={mistakes}
               elapsedTime={elapsedTime}
+              snippet={currentSnippet}
+              onUnderstand={() =>
+                setShowExplanation(true)
+              }
               onRestart={restartTest}
             />
           ) : (
             <TypingArea
-              mode={mode}
+              mode={content.mode}
               text={text}
               typedText={typedText}
               onTypedTextChange={setTypedText}
-              onCorrectKeystroke={registerCorrectKeystroke}
+              onCorrectKeystroke={
+                registerCorrectKeystroke
+              }
               onMistake={registerMistake}
               timeLeft={timeLeft}
               isRunning={isRunning}
