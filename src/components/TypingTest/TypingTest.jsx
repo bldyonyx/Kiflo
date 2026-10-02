@@ -11,6 +11,8 @@ function TypingTest() {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
   const [typedText, setTypedText] = useState("");
+  const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+  const [mistakes, setMistakes] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
   const [text, setText] = useState(() =>
@@ -35,17 +37,21 @@ function TypingTest() {
     return getRandomItem(content);
   };
 
-  useEffect(() => {
-    setText(getContentForMode(mode));
+  const resetTestState = () => {
     setTypedText("");
+    setCorrectKeystrokes(0);
+    setMistakes(0);
     setIsFinished(false);
     resetTimer();
+  };
+
+  useEffect(() => {
+    setText(getContentForMode(mode));
+    resetTestState();
   }, [mode]);
 
   useEffect(() => {
-    setTypedText("");
-    setIsFinished(false);
-    resetTimer();
+    resetTestState();
   }, [duration]);
 
   useEffect(() => {
@@ -65,23 +71,23 @@ function TypingTest() {
 
   const restartTest = () => {
     setText(getContentForMode(mode));
-    setTypedText("");
-    setIsFinished(false);
-    resetTimer();
+    resetTestState();
   };
 
-  const correctCharacters = typedText
-    .split("")
-    .filter(
-      (character, index) => character === text[index]
-    ).length;
+  const registerCorrectKeystroke = () => {
+    setCorrectKeystrokes((current) => current + 1);
+  };
 
-  const errors = typedText.length - correctCharacters;
+  const registerMistake = () => {
+    setMistakes((current) => current + 1);
+  };
+
+  const totalKeystrokes = correctKeystrokes + mistakes;
 
   const accuracy =
-    typedText.length > 0
+    totalKeystrokes > 0
       ? Math.round(
-          (correctCharacters / typedText.length) * 100
+          (correctKeystrokes / totalKeystrokes) * 100
         )
       : 0;
 
@@ -89,7 +95,7 @@ function TypingTest() {
 
   const wpm =
     minutes > 0
-      ? Math.round(correctCharacters / 5 / minutes)
+      ? Math.round(correctKeystrokes / 5 / minutes)
       : 0;
 
   return (
@@ -107,7 +113,7 @@ function TypingTest() {
             <Results
               wpm={wpm}
               accuracy={accuracy}
-              errors={errors}
+              mistakes={mistakes}
               elapsedTime={elapsedTime}
               onRestart={restartTest}
             />
@@ -117,6 +123,8 @@ function TypingTest() {
               text={text}
               typedText={typedText}
               onTypedTextChange={setTypedText}
+              onCorrectKeystroke={registerCorrectKeystroke}
+              onMistake={registerMistake}
               timeLeft={timeLeft}
               isRunning={isRunning}
               onStart={startTimer}

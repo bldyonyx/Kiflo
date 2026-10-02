@@ -1,7 +1,7 @@
 function Results({
   wpm,
   accuracy,
-  errors,
+  mistakes,
   elapsedTime,
   onRestart,
 }) {
@@ -32,10 +32,10 @@ function Results({
 
         <div className="text-center">
           <p className="text-4xl text-error">
-            {errors}
+            {mistakes}
           </p>
           <p className="mt-2 text-sm text-muted">
-            errors
+            mistakes
           </p>
         </div>
       </div>

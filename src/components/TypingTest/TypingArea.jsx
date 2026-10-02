@@ -6,6 +6,8 @@ function TypingArea({
   mode,
   typedText,
   onTypedTextChange,
+  onCorrectKeystroke,
+  onMistake,
   timeLeft,
   isRunning,
   onStart,
@@ -45,6 +47,8 @@ function TypingArea({
           onStart();
         }
 
+        onCorrectKeystroke();
+
         const updatedText = `${typedText}\n`;
 
         onTypedTextChange(updatedText);
@@ -68,6 +72,12 @@ function TypingArea({
         onStart();
       }
 
+      if (event.key === expectedCharacter) {
+        onCorrectKeystroke();
+      } else {
+        onMistake();
+      }
+
       const updatedText = typedText + event.key;
 
       onTypedTextChange(updatedText);
@@ -89,6 +99,8 @@ function TypingArea({
     isRunning,
     onStart,
     onFinish,
+    onCorrectKeystroke,
+    onMistake,
     onTypedTextChange,
   ]);
 
@@ -142,7 +154,7 @@ function TypingArea({
                     className="relative inline-block"
                     aria-hidden="true"
                   >
-                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5g-accent" />
+                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-[2px] bg-accent" />
                   </span>
                 )}
 
@@ -158,7 +170,7 @@ function TypingArea({
             >
               {isCurrentCharacter && (
                 <span
-                  className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
+                  className="typing-caret absolute -left-[1px] top-[0.15em] h-[1em] w-[2px] bg-accent"
                   aria-hidden="true"
                 />
               )}
