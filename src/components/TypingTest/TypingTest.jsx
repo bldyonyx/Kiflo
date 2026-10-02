@@ -1,165 +1,70 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TestControls from "./TestControls";
 import TypingArea from "./TypingArea";
 import Results from "./Results";
 import CodeExplanation from "./CodeExplanation";
-import useTimer from "../../hooks/useTimer";
-import texts from "../../data/texts";
-import javascriptSnippets from "../../data/javascriptSnippets";
-import getRandomItem from "../../utils/getRandomItem";
+import useTypingTest from "../../hooks/useTypingTest";
 
 function TypingTest({ fontMode }) {
-  const [mode, setMode] = useState("text");
-  const [duration, setDuration] = useState(30);
   const [textSize, setTextSize] =
     useState("medium");
   const [textSpacing, setTextSpacing] =
     useState("normal");
-
-  const [typedText, setTypedText] =
-    useState("");
-  const [
-    correctKeystrokes,
-    setCorrectKeystrokes,
-  ] = useState(0);
-  const [mistakes, setMistakes] =
-    useState(0);
-  const [isFinished, setIsFinished] =
-    useState(false);
   const [
     showExplanation,
     setShowExplanation,
   ] = useState(false);
 
-  const [content, setContent] = useState(
-    () => ({
-      mode: "text",
-      value: getRandomItem(texts),
-    })
-  );
-
   const {
+    mode,
+    setMode,
+    duration,
+    setDuration,
+    content,
+    text,
+    currentSnippet,
+    typedText,
+    setTypedText,
+    mistakes,
+    isFinished,
     timeLeft,
     isRunning,
     elapsedTime,
+    wpm,
+    accuracy,
     startTimer,
-    stopTimer,
-    resetTimer,
-  } = useTimer(duration);
+    finishTest,
+    restartTest,
+    registerCorrectKeystroke,
+    registerMistake,
+  } = useTypingTest();
 
-  const getContentForMode = (
-    selectedMode
-  ) => {
-    if (selectedMode === "javascript") {
-      return {
-        mode: "javascript",
-        value: getRandomItem(
-          javascriptSnippets
-        ),
-      };
-    }
-
-    return {
-      mode: "text",
-      value: getRandomItem(texts),
-    };
-  };
-
-  const text =
-    content.mode === "javascript"
-      ? content.value.code
-      : content.value;
-
-  const resetTestState = () => {
-    setTypedText("");
-    setCorrectKeystrokes(0);
-    setMistakes(0);
-    setIsFinished(false);
+  const handleModeChange = (newMode) => {
     setShowExplanation(false);
-    resetTimer();
+    setMode(newMode);
   };
 
-  useEffect(() => {
-    setContent(getContentForMode(mode));
-    resetTestState();
-  }, [mode]);
-
-  useEffect(() => {
-    resetTestState();
-  }, [duration]);
-
-  useEffect(() => {
-    if (
-      timeLeft === 0 &&
-      typedText.length > 0
-    ) {
-      setIsFinished(true);
-    }
-  }, [timeLeft, typedText]);
-
-  const finishTest = () => {
-    if (typedText.length === 0) {
-      return;
-    }
-
-    stopTimer();
-    setIsFinished(true);
+  const handleDurationChange = (
+    newDuration
+  ) => {
+    setShowExplanation(false);
+    setDuration(newDuration);
   };
 
-  const restartTest = () => {
-    setContent(getContentForMode(mode));
-    resetTestState();
+  const handleRestart = () => {
+    setShowExplanation(false);
+    restartTest();
   };
-
-  const registerCorrectKeystroke = () => {
-    setCorrectKeystrokes(
-      (current) => current + 1
-    );
-  };
-
-  const registerMistake = () => {
-    setMistakes(
-      (current) => current + 1
-    );
-  };
-
-  const totalKeystrokes =
-    correctKeystrokes + mistakes;
-
-  const accuracy =
-    totalKeystrokes > 0
-      ? Math.round(
-          (correctKeystrokes /
-            totalKeystrokes) *
-            100
-        )
-      : 0;
-
-  const minutes = elapsedTime / 60;
-
-  const wpm =
-    minutes > 0
-      ? Math.round(
-          correctKeystrokes /
-            5 /
-            minutes
-        )
-      : 0;
-
-  const currentSnippet =
-    content.mode === "javascript"
-      ? content.value
-      : null;
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center">
       <div className="flex w-full max-w-4xl flex-col gap-12">
         <TestControls
           mode={mode}
-          onModeChange={setMode}
+          onModeChange={handleModeChange}
           duration={duration}
           onDurationChange={
-            setDuration
+            handleDurationChange
           }
           textSize={textSize}
           onTextSizeChange={
@@ -181,7 +86,7 @@ function TypingTest({ fontMode }) {
                   false
                 )
               }
-              onRestart={restartTest}
+              onRestart={handleRestart}
               fontMode={fontMode}
             />
           ) : isFinished ? (
@@ -200,7 +105,7 @@ function TypingTest({ fontMode }) {
                   true
                 )
               }
-              onRestart={restartTest}
+              onRestart={handleRestart}
             />
           ) : (
             <TypingArea
