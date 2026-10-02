@@ -39,3 +39,36 @@ body {
 .typing-caret {
   animation: caret-blink 1s step-end infinite;
 }
+
+
+.syntax-keyword {
+  color: #c792ea;
+}
+
+.syntax-string {
+  color: #c3e88d;
+}
+
+.syntax-number {
+  color: #f78c6c;
+}
+
+.syntax-function {
+  color: #82aaff;
+}
+
+.syntax-boolean {
+  color: #f78c6c;
+}
+
+.syntax-operator {
+  color: #89ddff;
+}
+
+.syntax-comment {
+  color: #676e95;
+}
+
+.syntax-punctuation {
+  color: #a6accd;
+}

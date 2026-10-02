@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
 function TypingArea({
   text,
+  mode,
   typedText,
   onTypedTextChange,
   timeLeft,
@@ -9,6 +11,14 @@ function TypingArea({
   onStart,
   onFinish,
 }) {
+  const syntaxCharacters = useMemo(() => {
+    if (mode !== "javascript") {
+      return [];
+    }
+
+    return tokenizeJavaScript(text);
+  }, [mode, text]);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (timeLeft === 0) {
@@ -82,6 +92,30 @@ function TypingArea({
     onTypedTextChange,
   ]);
 
+  const getCharacterClass = (
+    character,
+    typedCharacter,
+    index
+  ) => {
+    if (typedCharacter === undefined) {
+      return "text-muted";
+    }
+
+    if (typedCharacter !== character) {
+      return "text-error";
+    }
+
+    if (mode !== "javascript") {
+      return "text-text";
+    }
+
+    const syntaxType = syntaxCharacters[index]?.type;
+
+    return syntaxType
+      ? `syntax-${syntaxType}`
+      : "text-text";
+  };
+
   return (
     <div>
       <p className="mb-4 font-mono text-sm text-accent">
@@ -94,14 +128,11 @@ function TypingArea({
           const isCurrentCharacter =
             index === typedText.length;
 
-          let characterClass = "text-muted";
-
-          if (typedCharacter !== undefined) {
-            characterClass =
-              typedCharacter === character
-                ? "text-text"
-                : "text-error";
-          }
+          const characterClass = getCharacterClass(
+            character,
+            typedCharacter,
+            index
+          );
 
           if (character === "\n") {
             return (
@@ -111,9 +142,10 @@ function TypingArea({
                     className="relative inline-block"
                     aria-hidden="true"
                   >
-                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5 bg-accent" />
+                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5g-accent" />
                   </span>
                 )}
+
                 {"\n"}
               </span>
             );

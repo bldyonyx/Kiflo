@@ -113,6 +113,7 @@ function TypingTest() {
             />
           ) : (
             <TypingArea
+              mode={mode}
               text={text}
               typedText={typedText}
               onTypedTextChange={setTypedText}
