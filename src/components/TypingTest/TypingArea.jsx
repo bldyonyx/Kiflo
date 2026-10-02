@@ -1,4 +1,7 @@
-import { useEffect, useMemo } from "react";
+import {
+  useEffect,
+  useMemo,
+} from "react";
 import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
 const textSizeClasses = {
@@ -11,6 +14,12 @@ const textSpacingClasses = {
   compact: "leading-snug",
   normal: "leading-relaxed",
   relaxed: "leading-loose",
+};
+
+const fontClasses = {
+  default: "font-mono",
+  dyslexic: "font-dyslexic",
+  hyperlegible: "font-hyperlegible",
 };
 
 function TypingArea({
@@ -26,6 +35,7 @@ function TypingArea({
   onFinish,
   textSize,
   textSpacing,
+  fontMode,
 }) {
   const syntaxCharacters = useMemo(() => {
     if (mode !== "javascript") {
@@ -48,12 +58,15 @@ function TypingArea({
         return;
       }
 
-      const expectedCharacter = text[typedText.length];
+      const expectedCharacter =
+        text[typedText.length];
 
       if (event.key === "Enter") {
         event.preventDefault();
 
-        if (expectedCharacter !== "\n") {
+        if (
+          expectedCharacter !== "\n"
+        ) {
           return;
         }
 
@@ -63,11 +76,17 @@ function TypingArea({
 
         onCorrectKeystroke();
 
-        const updatedText = `${typedText}\n`;
+        const updatedText =
+          `${typedText}\n`;
 
-        onTypedTextChange(updatedText);
+        onTypedTextChange(
+          updatedText
+        );
 
-        if (updatedText.length === text.length) {
+        if (
+          updatedText.length ===
+          text.length
+        ) {
           setTimeout(onFinish, 0);
         }
 
@@ -78,7 +97,9 @@ function TypingArea({
         return;
       }
 
-      if (expectedCharacter === "\n") {
+      if (
+        expectedCharacter === "\n"
+      ) {
         return;
       }
 
@@ -86,22 +107,32 @@ function TypingArea({
         onStart();
       }
 
-      if (event.key === expectedCharacter) {
+      if (
+        event.key ===
+        expectedCharacter
+      ) {
         onCorrectKeystroke();
       } else {
         onMistake();
       }
 
-      const updatedText = typedText + event.key;
+      const updatedText =
+        typedText + event.key;
 
       onTypedTextChange(updatedText);
 
-      if (updatedText.length === text.length) {
+      if (
+        updatedText.length ===
+        text.length
+      ) {
         setTimeout(onFinish, 0);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
       window.removeEventListener(
@@ -126,19 +157,26 @@ function TypingArea({
     typedCharacter,
     index
   ) => {
-    if (typedCharacter === undefined) {
+    if (
+      typedCharacter === undefined
+    ) {
       return "text-muted";
     }
 
-    if (typedCharacter !== character) {
+    if (
+      typedCharacter !== character
+    ) {
       return "text-error";
     }
 
-    if (mode !== "javascript") {
+    if (
+      mode !== "javascript"
+    ) {
       return "text-text";
     }
 
-    const syntaxType = syntaxCharacters[index]?.type;
+    const syntaxType =
+      syntaxCharacters[index]?.type;
 
     return syntaxType
       ? `syntax-${syntaxType}`
@@ -150,8 +188,14 @@ function TypingArea({
     textSizeClasses.medium;
 
   const spacingClass =
-    textSpacingClasses[textSpacing] ??
+    textSpacingClasses[
+      textSpacing
+    ] ??
     textSpacingClasses.normal;
+
+  const fontClass =
+    fontClasses[fontMode] ??
+    fontClasses.default;
 
   return (
     <div>
@@ -160,53 +204,65 @@ function TypingArea({
       </p>
 
       <pre
-        className={`whitespace-pre-wrap font-mono ${sizeClass} ${spacingClass}`}
+        className={`whitespace-pre-wrap ${fontClass} ${sizeClass} ${spacingClass}`}
       >
-        {text.split("").map((character, index) => {
-          const typedCharacter = typedText[index];
+        {text
+          .split("")
+          .map(
+            (
+              character,
+              index
+            ) => {
+              const typedCharacter =
+                typedText[index];
 
-          const isCurrentCharacter =
-            index === typedText.length;
+              const isCurrentCharacter =
+                index ===
+                typedText.length;
 
-          const characterClass = getCharacterClass(
-            character,
-            typedCharacter,
-            index
-          );
+              const characterClass =
+                getCharacterClass(
+                  character,
+                  typedCharacter,
+                  index
+                );
 
-          if (character === "\n") {
-            return (
-              <span key={index}>
-                {isCurrentCharacter && (
-                  <span
-                    className="relative inline-block"
-                    aria-hidden="true"
-                  >
-                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5 bg-accent" />
+              if (
+                character === "\n"
+              ) {
+                return (
+                  <span key={index}>
+                    {isCurrentCharacter && (
+                      <span
+                        className="relative inline-block"
+                        aria-hidden="true"
+                      >
+                        <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5 bg-accent" />
+                      </span>
+                    )}
+
+                    {"\n"}
                   </span>
-                )}
+                );
+              }
 
-                {"\n"}
-              </span>
-            );
-          }
-
-          return (
-            <span
-              key={index}
-              className={`relative ${characterClass}`}
-            >
-              {isCurrentCharacter && (
+              return (
                 <span
-                  className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
-                  aria-hidden="true"
-                />
-              )}
+                  key={index}
+                  className={`relative ${characterClass}`}
+                >
+                  {isCurrentCharacter && (
+                    <span
+                      className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
+                      aria-hidden="true"
+                    />
+                  )}
 
-              {character}
-            </span>
-          );
-        })}
+                  {character}
+                </span>
+              );
+            }
+          )}
       </pre>
     </div>
   );

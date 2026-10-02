@@ -1,10 +1,23 @@
+const fontClasses = {
+  default: "font-mono",
+  dyslexic: "font-dyslexic",
+  hyperlegible: "font-hyperlegible",
+};
+
 function CodeExplanation({
   snippet,
   onBack,
   onRestart,
+  fontMode,
 }) {
+  const fontClass =
+    fontClasses[fontMode] ??
+    fontClasses.default;
+
   return (
-    <div className="flex justify-center font-mono">
+    <div
+      className={`flex justify-center ${fontClass}`}
+    >
       <div className="w-full max-w-2xl">
         <p className="mb-10 text-sm text-accent">
           {"<>"} understand this code
@@ -19,15 +32,21 @@ function CodeExplanation({
         </p>
 
         <div className="mt-6 flex flex-wrap gap-x-3 gap-y-2 text-xs text-subtle">
-          {snippet.concepts.map((concept, index) => (
-            <span key={concept}>
-              {concept}
+          {snippet.concepts.map(
+            (concept, index) => (
+              <span key={concept}>
+                {concept}
 
-              {index < snippet.concepts.length - 1 && (
-                <span className="ml-3">·</span>
-              )}
-            </span>
-          ))}
+                {index <
+                  snippet.concepts.length -
+                    1 && (
+                  <span className="ml-3">
+                    ·
+                  </span>
+                )}
+              </span>
+            )
+          )}
         </div>
 
         <div className="mt-12 flex items-center gap-3">

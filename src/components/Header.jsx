@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SideMenu from "./SideMenu";
 
-function Header() {
+function Header({
+  fontMode,
+  onFontModeChange,
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -29,6 +32,8 @@ function Header() {
       <SideMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
+        fontMode={fontMode}
+        onFontModeChange={onFontModeChange}
       />
     </>
   );

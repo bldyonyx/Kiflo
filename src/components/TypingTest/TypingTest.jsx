@@ -8,25 +8,35 @@ import texts from "../../data/texts";
 import javascriptSnippets from "../../data/javascriptSnippets";
 import getRandomItem from "../../utils/getRandomItem";
 
-function TypingTest() {
+function TypingTest({ fontMode }) {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
-  const [textSize, setTextSize] = useState("medium");
+  const [textSize, setTextSize] =
+    useState("medium");
   const [textSpacing, setTextSpacing] =
     useState("normal");
 
-  const [typedText, setTypedText] = useState("");
-  const [correctKeystrokes, setCorrectKeystrokes] =
+  const [typedText, setTypedText] =
+    useState("");
+  const [
+    correctKeystrokes,
+    setCorrectKeystrokes,
+  ] = useState(0);
+  const [mistakes, setMistakes] =
     useState(0);
-  const [mistakes, setMistakes] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
-  const [showExplanation, setShowExplanation] =
+  const [isFinished, setIsFinished] =
     useState(false);
+  const [
+    showExplanation,
+    setShowExplanation,
+  ] = useState(false);
 
-  const [content, setContent] = useState(() => ({
-    mode: "text",
-    value: getRandomItem(texts),
-  }));
+  const [content, setContent] = useState(
+    () => ({
+      mode: "text",
+      value: getRandomItem(texts),
+    })
+  );
 
   const {
     timeLeft,
@@ -37,11 +47,15 @@ function TypingTest() {
     resetTimer,
   } = useTimer(duration);
 
-  const getContentForMode = (selectedMode) => {
+  const getContentForMode = (
+    selectedMode
+  ) => {
     if (selectedMode === "javascript") {
       return {
         mode: "javascript",
-        value: getRandomItem(javascriptSnippets),
+        value: getRandomItem(
+          javascriptSnippets
+        ),
       };
     }
 
@@ -75,7 +89,10 @@ function TypingTest() {
   }, [duration]);
 
   useEffect(() => {
-    if (timeLeft === 0 && typedText.length > 0) {
+    if (
+      timeLeft === 0 &&
+      typedText.length > 0
+    ) {
       setIsFinished(true);
     }
   }, [timeLeft, typedText]);
@@ -95,11 +112,15 @@ function TypingTest() {
   };
 
   const registerCorrectKeystroke = () => {
-    setCorrectKeystrokes((current) => current + 1);
+    setCorrectKeystrokes(
+      (current) => current + 1
+    );
   };
 
   const registerMistake = () => {
-    setMistakes((current) => current + 1);
+    setMistakes(
+      (current) => current + 1
+    );
   };
 
   const totalKeystrokes =
@@ -108,7 +129,9 @@ function TypingTest() {
   const accuracy =
     totalKeystrokes > 0
       ? Math.round(
-          (correctKeystrokes / totalKeystrokes) * 100
+          (correctKeystrokes /
+            totalKeystrokes) *
+            100
         )
       : 0;
 
@@ -117,7 +140,9 @@ function TypingTest() {
   const wpm =
     minutes > 0
       ? Math.round(
-          correctKeystrokes / 5 / minutes
+          correctKeystrokes /
+            5 /
+            minutes
         )
       : 0;
 
@@ -133,31 +158,47 @@ function TypingTest() {
           mode={mode}
           onModeChange={setMode}
           duration={duration}
-          onDurationChange={setDuration}
+          onDurationChange={
+            setDuration
+          }
           textSize={textSize}
-          onTextSizeChange={setTextSize}
+          onTextSizeChange={
+            setTextSize
+          }
           textSpacing={textSpacing}
-          onTextSpacingChange={setTextSpacing}
+          onTextSpacingChange={
+            setTextSpacing
+          }
         />
 
         <div className="min-h-48">
-          {showExplanation && currentSnippet ? (
+          {showExplanation &&
+          currentSnippet ? (
             <CodeExplanation
               snippet={currentSnippet}
               onBack={() =>
-                setShowExplanation(false)
+                setShowExplanation(
+                  false
+                )
               }
               onRestart={restartTest}
+              fontMode={fontMode}
             />
           ) : isFinished ? (
             <Results
               wpm={wpm}
               accuracy={accuracy}
               mistakes={mistakes}
-              elapsedTime={elapsedTime}
-              snippet={currentSnippet}
+              elapsedTime={
+                elapsedTime
+              }
+              snippet={
+                currentSnippet
+              }
               onUnderstand={() =>
-                setShowExplanation(true)
+                setShowExplanation(
+                  true
+                )
               }
               onRestart={restartTest}
             />
@@ -166,17 +207,24 @@ function TypingTest() {
               mode={content.mode}
               text={text}
               typedText={typedText}
-              onTypedTextChange={setTypedText}
+              onTypedTextChange={
+                setTypedText
+              }
               onCorrectKeystroke={
                 registerCorrectKeystroke
               }
-              onMistake={registerMistake}
+              onMistake={
+                registerMistake
+              }
               timeLeft={timeLeft}
               isRunning={isRunning}
               onStart={startTimer}
               onFinish={finishTest}
               textSize={textSize}
-              textSpacing={textSpacing}
+              textSpacing={
+                textSpacing
+              }
+              fontMode={fontMode}
             />
           )}
         </div>

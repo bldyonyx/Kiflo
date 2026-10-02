@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 
-function SideMenu({ isOpen, onClose }) {
+function SideMenu({
+  isOpen,
+  onClose,
+  fontMode,
+  onFontModeChange,
+}) {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -9,13 +14,28 @@ function SideMenu({ isOpen, onClose }) {
     };
 
     if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener(
+        "keydown",
+        handleKeyDown
+      );
     }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
   }, [isOpen, onClose]);
+
+  const handleFontChange = (selectedFont) => {
+    if (fontMode === selectedFont) {
+      onFontModeChange("default");
+      return;
+    }
+
+    onFontModeChange(selectedFont);
+  };
 
   return (
     <>
@@ -32,7 +52,9 @@ function SideMenu({ isOpen, onClose }) {
 
       <aside
         className={`fixed right-0 top-0 z-50 flex h-screen w-full max-w-sm flex-col border-l border-subtle bg-background px-8 py-8 transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen
+            ? "translate-x-0"
+            : "translate-x-full"
         }`}
         aria-hidden={!isOpen}
       >
@@ -57,17 +79,66 @@ function SideMenu({ isOpen, onClose }) {
               accessibility
             </p>
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-between text-sm text-muted transition-colors hover:text-text"
-            >
-              <span>dyslexia-friendly font</span>
+            <div className="flex flex-col gap-5">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={
+                  fontMode === "dyslexic"
+                }
+                onClick={() =>
+                  handleFontChange("dyslexic")
+                }
+                className="flex w-full items-center justify-between text-sm text-muted transition-colors hover:text-text"
+              >
+                <span>
+                  dyslexia-friendly font
+                </span>
 
-              <span
-                className="h-3 w-3 rounded-full border border-muted"
-                aria-hidden="true"
-              />
-            </button>
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
+                    fontMode === "dyslexic"
+                      ? "border-accent"
+                      : "border-muted"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {fontMode === "dyslexic" && (
+                    <span className="h-2 w-2 rounded-full bg-accent" />
+                  )}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={
+                  fontMode === "hyperlegible"
+                }
+                onClick={() =>
+                  handleFontChange(
+                    "hyperlegible"
+                  )
+                }
+                className="flex w-full items-center justify-between text-sm text-muted transition-colors hover:text-text"
+              >
+                <span>hyperlegible font</span>
+
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
+                    fontMode === "hyperlegible"
+                      ? "border-accent"
+                      : "border-muted"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {fontMode ===
+                    "hyperlegible" && (
+                    <span className="h-2 w-2 rounded-full bg-accent" />
+                  )}
+                </span>
+              </button>
+            </div>
           </section>
 
           <section className="mt-10">
@@ -92,8 +163,8 @@ function SideMenu({ isOpen, onClose }) {
 
           <section>
             <p className="text-sm leading-7 text-muted">
-              a typing speed test for practicing with
-              text and code.
+              a typing speed test for practicing
+              with text and code.
             </p>
 
             <p className="mt-3 text-xs leading-6 text-subtle">
