@@ -1,6 +1,18 @@
 import { useEffect, useMemo } from "react";
 import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
+const textSizeClasses = {
+  small: "text-2xl",
+  medium: "text-3xl",
+  large: "text-4xl",
+};
+
+const textSpacingClasses = {
+  compact: "leading-snug",
+  normal: "leading-relaxed",
+  relaxed: "leading-loose",
+};
+
 function TypingArea({
   text,
   mode,
@@ -12,6 +24,8 @@ function TypingArea({
   isRunning,
   onStart,
   onFinish,
+  textSize,
+  textSpacing,
 }) {
   const syntaxCharacters = useMemo(() => {
     if (mode !== "javascript") {
@@ -90,7 +104,10 @@ function TypingArea({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
   }, [
     text,
@@ -128,15 +145,26 @@ function TypingArea({
       : "text-text";
   };
 
+  const sizeClass =
+    textSizeClasses[textSize] ??
+    textSizeClasses.medium;
+
+  const spacingClass =
+    textSpacingClasses[textSpacing] ??
+    textSpacingClasses.normal;
+
   return (
     <div>
       <p className="mb-4 font-mono text-sm text-accent">
         {timeLeft}
       </p>
 
-      <pre className="whitespace-pre-wrap font-mono text-3xl leading-relaxed">
+      <pre
+        className={`whitespace-pre-wrap font-mono ${sizeClass} ${spacingClass}`}
+      >
         {text.split("").map((character, index) => {
           const typedCharacter = typedText[index];
+
           const isCurrentCharacter =
             index === typedText.length;
 
@@ -154,7 +182,7 @@ function TypingArea({
                     className="relative inline-block"
                     aria-hidden="true"
                   >
-                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5g-accent" />
+                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-[2px] bg-accent" />
                   </span>
                 )}
 
@@ -170,7 +198,7 @@ function TypingArea({
             >
               {isCurrentCharacter && (
                 <span
-                  className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
+                  className="typing-caret absolute -left-[1px] top-[0.15em] h-[1em] w-[2px] bg-accent"
                   aria-hidden="true"
                 />
               )}

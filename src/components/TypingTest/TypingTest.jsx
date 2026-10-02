@@ -11,6 +11,10 @@ import getRandomItem from "../../utils/getRandomItem";
 function TypingTest() {
   const [mode, setMode] = useState("text");
   const [duration, setDuration] = useState(30);
+  const [textSize, setTextSize] = useState("medium");
+  const [textSpacing, setTextSpacing] =
+    useState("normal");
+
   const [typedText, setTypedText] = useState("");
   const [correctKeystrokes, setCorrectKeystrokes] =
     useState(0);
@@ -130,13 +134,19 @@ function TypingTest() {
           onModeChange={setMode}
           duration={duration}
           onDurationChange={setDuration}
+          textSize={textSize}
+          onTextSizeChange={setTextSize}
+          textSpacing={textSpacing}
+          onTextSpacingChange={setTextSpacing}
         />
 
         <div className="min-h-48">
           {showExplanation && currentSnippet ? (
             <CodeExplanation
               snippet={currentSnippet}
-              onBack={() => setShowExplanation(false)}
+              onBack={() =>
+                setShowExplanation(false)
+              }
               onRestart={restartTest}
             />
           ) : isFinished ? (
@@ -165,6 +175,8 @@ function TypingTest() {
               isRunning={isRunning}
               onStart={startTimer}
               onFinish={finishTest}
+              textSize={textSize}
+              textSpacing={textSpacing}
             />
           )}
         </div>
