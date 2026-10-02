@@ -1,9 +1,13 @@
-import { useState } from "react";
 import Header from "./components/Header";
 import TypingTest from "./components/TypingTest/TypingTest";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 function App() {
-  const [fontMode, setFontMode] = useState("default");
+  const [fontMode, setFontMode] =
+    useLocalStorage(
+      "kiflo-font-mode",
+      "default"
+    );
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col px-8 py-8">

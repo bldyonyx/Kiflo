@@ -4,12 +4,21 @@ import TypingArea from "./TypingArea";
 import Results from "./Results";
 import CodeExplanation from "./CodeExplanation";
 import useTypingTest from "../../hooks/useTypingTest";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 function TypingTest({ fontMode }) {
   const [textSize, setTextSize] =
-    useState("medium");
+    useLocalStorage(
+      "kiflo-text-size",
+      "medium"
+    );
+
   const [textSpacing, setTextSpacing] =
-    useState("normal");
+    useLocalStorage(
+      "kiflo-text-spacing",
+      "normal"
+    );
+
   const [
     showExplanation,
     setShowExplanation,
