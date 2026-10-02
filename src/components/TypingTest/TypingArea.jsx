@@ -22,7 +22,35 @@ function TypingArea({
         return;
       }
 
+      const expectedCharacter = text[typedText.length];
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+
+        if (expectedCharacter !== "\n") {
+          return;
+        }
+
+        if (!isRunning) {
+          onStart();
+        }
+
+        const updatedText = `${typedText}\n`;
+
+        onTypedTextChange(updatedText);
+
+        if (updatedText.length === text.length) {
+          setTimeout(onFinish, 0);
+        }
+
+        return;
+      }
+
       if (event.key.length !== 1) {
+        return;
+      }
+
+      if (expectedCharacter === "\n") {
         return;
       }
 
@@ -30,21 +58,13 @@ function TypingArea({
         onStart();
       }
 
-      onTypedTextChange((current) => {
-        if (current.length >= text.length) {
-          return current;
-        }
+      const updatedText = typedText + event.key;
 
-        const updatedText = current + event.key;
+      onTypedTextChange(updatedText);
 
-        if (updatedText.length === text.length) {
-          setTimeout(() => {
-            onFinish();
-          }, 0);
-        }
-
-        return updatedText;
-      });
+      if (updatedText.length === text.length) {
+        setTimeout(onFinish, 0);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -54,6 +74,7 @@ function TypingArea({
     };
   }, [
     text,
+    typedText,
     timeLeft,
     isRunning,
     onStart,
@@ -67,7 +88,7 @@ function TypingArea({
         {timeLeft}
       </p>
 
-      <p className="font-mono text-3xl leading-relaxed">
+      <pre className="whitespace-pre-wrap font-mono text-3xl leading-relaxed">
         {text.split("").map((character, index) => {
           const typedCharacter = typedText[index];
           const isCurrentCharacter =
@@ -82,6 +103,22 @@ function TypingArea({
                 : "text-error";
           }
 
+          if (character === "\n") {
+            return (
+              <span key={index}>
+                {isCurrentCharacter && (
+                  <span
+                    className="relative inline-block"
+                    aria-hidden="true"
+                  >
+                    <span className="typing-caret absolute left-0 top-[0.15em] h-[1em] w-0.5 bg-accent" />
+                  </span>
+                )}
+                {"\n"}
+              </span>
+            );
+          }
+
           return (
             <span
               key={index}
@@ -89,7 +126,7 @@ function TypingArea({
             >
               {isCurrentCharacter && (
                 <span
-                  className="typing-caret absolute -left-[1px] top-[0.15em] h-[1em] w-[2px] bg-accent"
+                  className="typing-caret absolute -left-px top-[0.15em] h-[1em] w-0.5 bg-accent"
                   aria-hidden="true"
                 />
               )}
@@ -98,7 +135,7 @@ function TypingArea({
             </span>
           );
         })}
-      </p>
+      </pre>
     </div>
   );
 }
