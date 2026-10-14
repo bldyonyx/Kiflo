@@ -1,4 +1,8 @@
-import { useEffect, useMemo } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
 const textSizeClasses = {
@@ -37,6 +41,12 @@ function TypingArea({
   textSpacing,
   fontMode,
 }) {
+  const typedTextRef = useRef(typedText);
+
+  useEffect(() => {
+    typedTextRef.current = typedText;
+  }, [typedText]);
+
   const syntaxCharacters = useMemo(() => {
     if (mode !== "javascript") {
       return [];
@@ -58,13 +68,21 @@ function TypingArea({
       );
     };
 
+    const isModalOpen = () =>
+      Boolean(
+        document.querySelector(
+          '[aria-modal="true"]:not([aria-hidden="true"])'
+        )
+      );
+
     const handleKeyDown = (event) => {
       if (
         event.defaultPrevented ||
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
-        isInteractiveTarget(event.target)
+        isInteractiveTarget(event.target) ||
+        isModalOpen()
       ) {
         return;
       }
@@ -75,15 +93,18 @@ function TypingArea({
 
       if (event.key === "Backspace") {
         event.preventDefault();
-        onTypedTextChange((current) =>
-          current.slice(0, -1)
-        );
+        typedTextRef.current =
+          typedTextRef.current.slice(0, -1);
+        onTypedTextChange(typedTextRef.current);
 
         return;
       }
 
+      const currentTypedText =
+        typedTextRef.current;
+
       const expectedCharacter =
-        text[typedText.length];
+        text[currentTypedText.length];
 
       if (event.key === "Enter") {
         event.preventDefault();
@@ -99,15 +120,16 @@ function TypingArea({
         onCorrectKeystroke();
 
         const updatedText =
-          `${typedText}\n`;
+          `${currentTypedText}\n`;
 
+        typedTextRef.current = updatedText;
         onTypedTextChange(updatedText);
 
         if (
           updatedText.length ===
           text.length
         ) {
-          setTimeout(onFinish, 0);
+          onFinish();
         }
 
         return;
@@ -134,15 +156,16 @@ function TypingArea({
       }
 
       const updatedText =
-        typedText + event.key;
+        currentTypedText + event.key;
 
+      typedTextRef.current = updatedText;
       onTypedTextChange(updatedText);
 
       if (
         updatedText.length ===
         text.length
       ) {
-        setTimeout(onFinish, 0);
+        onFinish();
       }
     };
 
@@ -159,7 +182,6 @@ function TypingArea({
     };
   }, [
     text,
-    typedText,
     timeLeft,
     isRunning,
     onStart,

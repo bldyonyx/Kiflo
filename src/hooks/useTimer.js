@@ -9,13 +9,14 @@ function useTimer(duration) {
   const intervalRef = useRef(null);
 
   const stopTimer = () => {
-    if (!isRunning || !startTimeRef.current) {
+    if (!startTimeRef.current) {
       return;
     }
 
     const elapsed =
       (Date.now() - startTimeRef.current) / 1000;
 
+    clearInterval(intervalRef.current);
     setElapsedTime(elapsed);
     setIsRunning(false);
   };
@@ -30,6 +31,7 @@ function useTimer(duration) {
   };
 
   const resetTimer = () => {
+    clearInterval(intervalRef.current);
     setTimeLeft(duration);
     setElapsedTime(0);
     setIsRunning(false);

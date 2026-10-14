@@ -94,10 +94,6 @@ function useTypingTest() {
   }, [timeLeft, typedText]);
 
   const finishTest = () => {
-    if (typedText.length === 0) {
-      return;
-    }
-
     stopTimer();
     setIsFinished(true);
   };
