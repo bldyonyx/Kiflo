@@ -2,9 +2,12 @@ import { useEffect, useMemo } from "react";
 import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
 const textSizeClasses = {
-  small: "text-2xl",
-  medium: "text-3xl",
-  large: "text-4xl",
+  small:
+    "text-xl sm:text-2xl min-[1800px]:text-[clamp(1.75rem,1.15vw,2.35rem)]",
+  medium:
+    "text-2xl sm:text-3xl min-[1800px]:text-[clamp(2.15rem,1.45vw,3rem)]",
+  large:
+    "text-3xl sm:text-4xl min-[1800px]:text-[clamp(2.65rem,1.8vw,3.75rem)]",
 };
 
 const textSpacingClasses = {
@@ -43,12 +46,35 @@ function TypingArea({
   }, [mode, text]);
 
   useEffect(() => {
+    const isInteractiveTarget = (target) => {
+      if (!(target instanceof Element)) {
+        return false;
+      }
+
+      return Boolean(
+        target.closest(
+          'button, a, input, select, textarea, [role="button"], [role="switch"], [contenteditable="true"], [aria-modal="true"]'
+        )
+      );
+    };
+
     const handleKeyDown = (event) => {
+      if (
+        event.defaultPrevented ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        isInteractiveTarget(event.target)
+      ) {
+        return;
+      }
+
       if (timeLeft === 0) {
         return;
       }
 
       if (event.key === "Backspace") {
+        event.preventDefault();
         onTypedTextChange((current) =>
           current.slice(0, -1)
         );
@@ -183,13 +209,13 @@ function TypingArea({
     fontClasses.default;
 
   return (
-    <div>
-      <p className="mb-4 font-mono text-sm text-accent">
+    <div className="w-full overflow-hidden">
+      <p className="mb-4 font-mono text-sm text-accent min-[1800px]:mb-6 min-[1800px]:text-base min-[2400px]:text-lg">
         {timeLeft}
       </p>
 
       <pre
-        className={`whitespace-pre-wrap ${fontClass} ${sizeClass} ${spacingClass}`}
+        className={`max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] [tab-size:2] ${fontClass} ${sizeClass} ${spacingClass}`}
       >
         {text
           .split("")
@@ -222,7 +248,7 @@ function TypingArea({
                         className="relative inline-block"
                         aria-hidden="true"
                       >
-                        <span className="typing-caret absolute left-0 top-1/2 h-[1em] w-[2px] -translate-y-1/2 bg-accent" />
+                        <span className="typing-caret absolute left-0 top-[0.1em] h-[1em] w-[2px] bg-accent" />
                       </span>
                     )}
 

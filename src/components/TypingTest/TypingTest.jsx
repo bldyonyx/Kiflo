@@ -66,8 +66,8 @@ function TypingTest({ fontMode }) {
   };
 
   return (
-    <section className="flex flex-1 flex-col items-center justify-center">
-      <div className="flex w-full max-w-4xl flex-col gap-12">
+    <section className="flex flex-1 flex-col items-center justify-center py-8 sm:py-10 min-[1800px]:py-14 min-[2400px]:py-16">
+      <div className="flex w-full max-w-4xl flex-col gap-8 sm:gap-10 lg:gap-12 min-[1800px]:max-w-[78rem] min-[1800px]:gap-16 min-[2400px]:max-w-[86rem] min-[2400px]:gap-20">
         <TestControls
           mode={mode}
           onModeChange={handleModeChange}
@@ -85,7 +85,7 @@ function TypingTest({ fontMode }) {
           }
         />
 
-        <div className="min-h-48">
+        <div className="min-h-[24rem] w-full sm:min-h-[26rem] min-[1800px]:min-h-[34rem] min-[2400px]:min-h-[38rem]">
           {showExplanation &&
           currentSnippet ? (
             <CodeExplanation

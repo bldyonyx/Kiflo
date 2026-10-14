@@ -31,18 +31,26 @@ function TestControls({
       "mousedown",
       handleClickOutside
     );
+    document.addEventListener(
+      "focusin",
+      handleClickOutside
+    );
 
     return () => {
       document.removeEventListener(
         "mousedown",
         handleClickOutside
       );
+      document.removeEventListener(
+        "focusin",
+        handleClickOutside
+      );
     };
   }, []);
 
   return (
-    <div className="flex items-center justify-center gap-6 text-sm">
-      <div className="flex gap-3">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-sm sm:gap-x-6 min-[1800px]:gap-x-8 min-[1800px]:gap-y-4 min-[1800px]:text-base min-[2400px]:text-lg">
+      <div className="flex items-center gap-3 min-[1800px]:gap-4">
         <button
           type="button"
           onClick={() => onModeChange("text")}
@@ -68,9 +76,9 @@ function TestControls({
         </button>
       </div>
 
-      <span className="text-subtle">/</span>
+      <span className="hidden text-subtle sm:inline">/</span>
 
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3 min-[1800px]:gap-4">
         {durations.map((seconds) => (
           <button
             key={seconds}
@@ -87,11 +95,11 @@ function TestControls({
         ))}
       </div>
 
-      <span className="text-subtle">/</span>
+      <span className="hidden text-subtle sm:inline">/</span>
 
       <div
         ref={settingsRef}
-        className="relative"
+        className="relative flex justify-center"
       >
         <button
           type="button"
@@ -110,13 +118,13 @@ function TestControls({
         </button>
 
         {isTextSettingsOpen && (
-          <div className="absolute right-0 top-8 z-10 w-64 rounded-md border border-subtle bg-background p-5 font-mono">
+          <div className="absolute left-1/2 top-8 z-10 w-[min(16rem,calc(100vw-2rem))] -translate-x-1/2 rounded-md border border-subtle bg-background p-5 font-mono shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:left-auto sm:right-0 sm:translate-x-0 min-[1800px]:top-10 min-[1800px]:w-72 min-[1800px]:p-6">
             <div>
               <p className="mb-3 text-xs text-muted">
                 text size
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
                 {["small", "medium", "large"].map(
                   (size) => (
                     <button
@@ -143,7 +151,7 @@ function TestControls({
                 spacing
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
                 {["compact", "normal", "relaxed"].map(
                   (spacing) => (
                     <button

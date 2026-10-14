@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function SideMenu({
   isOpen,
@@ -6,18 +6,78 @@ function SideMenu({
   fontMode,
   onFontModeChange,
 }) {
+  const menuRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (
+        event.key !== "Tab" ||
+        !menuRef.current
+      ) {
+        return;
+      }
+
+      const focusableElements =
+        menuRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+
+      if (focusableElements.length === 0) {
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement =
+        focusableElements[
+          focusableElements.length - 1
+        ];
+
+      if (
+        event.shiftKey &&
+        document.activeElement === firstElement
+      ) {
+        event.preventDefault();
+        lastElement.focus();
+        return;
+      }
+
+      if (
+        !event.shiftKey &&
+        document.activeElement === lastElement
+      ) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
     if (isOpen) {
+      const previousOverflow =
+        document.body.style.overflow;
+
+      document.body.style.overflow = "hidden";
       window.addEventListener(
         "keydown",
         handleKeyDown
       );
+
+      requestAnimationFrame(() => {
+        closeButtonRef.current?.focus();
+      });
+
+      return () => {
+        document.body.style.overflow =
+          previousOverflow;
+        window.removeEventListener(
+          "keydown",
+          handleKeyDown
+        );
+      };
     }
 
     return () => {
@@ -42,6 +102,8 @@ function SideMenu({
       <button
         type="button"
         aria-label="Close menu"
+        aria-hidden={!isOpen}
+        tabIndex={isOpen ? 0 : -1}
         onClick={onClose}
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
           isOpen
@@ -51,7 +113,13 @@ function SideMenu({
       />
 
       <aside
-        className={`fixed right-0 top-0 z-50 flex h-screen w-full max-w-sm flex-col border-l border-subtle bg-background px-8 py-8 transition-transform duration-300 ease-out ${
+        id="kiflo-menu"
+        ref={menuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Kiflo menu"
+        inert={!isOpen}
+        className={`fixed right-0 top-0 z-50 flex h-dvh w-full max-w-sm flex-col overflow-y-auto border-l border-subtle bg-background px-6 py-6 transition-transform duration-300 ease-out sm:px-8 sm:py-8 ${
           isOpen
             ? "translate-x-0"
             : "translate-x-full"
@@ -64,16 +132,17 @@ function SideMenu({
           </p>
 
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Close menu"
-            className="font-mono text-lg text-muted transition-colors hover:text-text"
+            className="flex h-10 w-10 items-center justify-center font-mono text-lg text-muted transition-colors hover:text-text focus:outline-none focus-visible:text-accent"
           >
-            ×
+            x
           </button>
         </div>
 
-        <div className="mt-14 font-mono">
+        <div className="mt-10 font-mono sm:mt-14">
           <section>
             <p className="mb-5 text-xs text-subtle">
               accessibility
@@ -139,24 +208,6 @@ function SideMenu({
                 </span>
               </button>
             </div>
-          </section>
-
-          <section className="mt-10">
-            <p className="mb-5 text-xs text-subtle">
-              sound
-            </p>
-
-            <button
-              type="button"
-              className="flex w-full items-center justify-between text-sm text-muted transition-colors hover:text-text"
-            >
-              <span>typing sounds</span>
-
-              <span
-                className="h-3 w-3 rounded-full border border-muted"
-                aria-hidden="true"
-              />
-            </button>
           </section>
 
           <div className="my-10 h-px bg-subtle" />
