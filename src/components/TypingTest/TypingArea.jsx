@@ -1,8 +1,5 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+
+import { useEffect, useMemo, useRef } from "react";
 import tokenizeJavaScript from "../../utils/tokenizeJavaScript";
 
 const textSizeClasses = {
@@ -93,16 +90,15 @@ function TypingArea({
 
       if (event.key === "Backspace") {
         event.preventDefault();
+
         typedTextRef.current =
           typedTextRef.current.slice(0, -1);
-        onTypedTextChange(typedTextRef.current);
 
+        onTypedTextChange(typedTextRef.current);
         return;
       }
 
-      const currentTypedText =
-        typedTextRef.current;
-
+      const currentTypedText = typedTextRef.current;
       const expectedCharacter =
         text[currentTypedText.length];
 
@@ -119,16 +115,12 @@ function TypingArea({
 
         onCorrectKeystroke();
 
-        const updatedText =
-          `${currentTypedText}\n`;
+        const updatedText = `${currentTypedText}\n`;
 
         typedTextRef.current = updatedText;
         onTypedTextChange(updatedText);
 
-        if (
-          updatedText.length ===
-          text.length
-        ) {
+        if (updatedText === text) {
           onFinish();
         }
 
@@ -147,9 +139,7 @@ function TypingArea({
         onStart();
       }
 
-      if (
-        event.key === expectedCharacter
-      ) {
+      if (event.key === expectedCharacter) {
         onCorrectKeystroke();
       } else {
         onMistake();
@@ -161,18 +151,12 @@ function TypingArea({
       typedTextRef.current = updatedText;
       onTypedTextChange(updatedText);
 
-      if (
-        updatedText.length ===
-        text.length
-      ) {
+      if (updatedText === text) {
         onFinish();
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener(
@@ -200,9 +184,7 @@ function TypingArea({
       return "text-muted";
     }
 
-    if (
-      typedCharacter !== character
-    ) {
+    if (typedCharacter !== character) {
       return "text-error";
     }
 
@@ -239,63 +221,51 @@ function TypingArea({
       <pre
         className={`max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] [tab-size:2] ${fontClass} ${sizeClass} ${spacingClass}`}
       >
-        {text
-          .split("")
-          .map(
-            (
+        {text.split("").map((character, index) => {
+          const typedCharacter = typedText[index];
+          const isCurrentCharacter =
+            index === typedText.length;
+
+          const characterClass =
+            getCharacterClass(
               character,
+              typedCharacter,
               index
-            ) => {
-              const typedCharacter =
-                typedText[index];
+            );
 
-              const isCurrentCharacter =
-                index ===
-                typedText.length;
-
-              const characterClass =
-                getCharacterClass(
-                  character,
-                  typedCharacter,
-                  index
-                );
-
-              if (
-                character === "\n"
-              ) {
-                return (
-                  <span key={index}>
-                    {isCurrentCharacter && (
-                      <span
-                        className="relative inline-block"
-                        aria-hidden="true"
-                      >
-                        <span className="typing-caret absolute left-0 top-[0.1em] h-[1em] w-[2px] bg-accent" />
-                      </span>
-                    )}
-
-                    {"\n"}
+          if (character === "\n") {
+            return (
+              <span key={index}>
+                {isCurrentCharacter && (
+                  <span
+                    className="relative inline-block"
+                    aria-hidden="true"
+                  >
+                    <span className="typing-caret absolute left-0 top-[0.1em] h-[1em] w-[2px] bg-accent" />
                   </span>
-                );
-              }
+                )}
 
-              return (
+                {"\n"}
+              </span>
+            );
+          }
+
+          return (
+            <span
+              key={index}
+              className={`relative ${characterClass}`}
+            >
+              {isCurrentCharacter && (
                 <span
-                  key={index}
-                  className={`relative ${characterClass}`}
-                >
-                  {isCurrentCharacter && (
-                    <span
-                      className="typing-caret absolute -left-[1px] top-1/2 h-[1em] w-[2px] -translate-y-1/2 bg-accent"
-                      aria-hidden="true"
-                    />
-                  )}
+                  className="typing-caret absolute -left-[1px] top-1/2 h-[1em] w-[2px] -translate-y-1/2 bg-accent"
+                  aria-hidden="true"
+                />
+              )}
 
-                  {character}
-                </span>
-              );
-            }
-          )}
+              {character}
+            </span>
+          );
+        })}
       </pre>
     </div>
   );
