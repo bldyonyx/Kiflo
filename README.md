@@ -1,7 +1,7 @@
 # Kiflo_
 
 > find your key flow.  
-> ₊˚⊹⌨ a typing speed test for text & code ⌨⊹˚₊
+> ₊˚⊹ a typing speed test for text & code ⊹˚₊
 
 Kiflo is a typing speed test made for practicing
 speed, accuracy, and flow with both text and code. (˶ᵔ ᵕ ᵔ˶)
