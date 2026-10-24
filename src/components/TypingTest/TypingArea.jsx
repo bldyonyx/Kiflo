@@ -78,6 +78,8 @@ function TypingArea({
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
+        event.isComposing ||
+        event.repeat && event.key === "Enter" ||
         isInteractiveTarget(event.target) ||
         isModalOpen()
       ) {
@@ -88,19 +90,27 @@ function TypingArea({
         return;
       }
 
+      const currentTypedText = typedTextRef.current;
+
       if (event.key === "Backspace") {
         event.preventDefault();
 
-        typedTextRef.current =
-          typedTextRef.current.slice(0, -1);
+        if (currentTypedText.length === 0) {
+          return;
+        }
 
-        onTypedTextChange(typedTextRef.current);
+        const updatedText = currentTypedText.slice(0, -1);
+
+        typedTextRef.current = updatedText;
+        onTypedTextChange(updatedText);
         return;
       }
 
-      const currentTypedText = typedTextRef.current;
-      const expectedCharacter =
-        text[currentTypedText.length];
+      if (currentTypedText.length >= text.length) {
+        return;
+      }
+
+      const expectedCharacter = text[currentTypedText.length];
 
       if (event.key === "Enter") {
         event.preventDefault();
@@ -145,8 +155,7 @@ function TypingArea({
         onMistake();
       }
 
-      const updatedText =
-        currentTypedText + event.key;
+      const updatedText = currentTypedText + event.key;
 
       typedTextRef.current = updatedText;
       onTypedTextChange(updatedText);
@@ -159,10 +168,7 @@ function TypingArea({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [
     text,
@@ -192,8 +198,7 @@ function TypingArea({
       return "text-text";
     }
 
-    const syntaxType =
-      syntaxCharacters[index]?.type;
+    const syntaxType = syntaxCharacters[index]?.type;
 
     return syntaxType
       ? `syntax-${syntaxType}`
@@ -201,16 +206,16 @@ function TypingArea({
   };
 
   const sizeClass =
-    textSizeClasses[textSize] ??
-    textSizeClasses.medium;
+    textSizeClasses[textSize] ?? textSizeClasses.medium;
 
   const spacingClass =
-    textSpacingClasses[textSpacing] ??
-    textSpacingClasses.normal;
+    textSpacingClasses[textSpacing] ?? textSpacingClasses.normal;
 
   const fontClass =
-    fontClasses[fontMode] ??
-    fontClasses.default;
+    fontClasses[fontMode] ?? fontClasses.default;
+
+  const isAtEndWithErrors =
+    typedText.length === text.length && typedText !== text;
 
   return (
     <div className="w-full overflow-hidden">
@@ -223,15 +228,13 @@ function TypingArea({
       >
         {text.split("").map((character, index) => {
           const typedCharacter = typedText[index];
-          const isCurrentCharacter =
-            index === typedText.length;
+          const isCurrentCharacter = index === typedText.length;
 
-          const characterClass =
-            getCharacterClass(
-              character,
-              typedCharacter,
-              index
-            );
+          const characterClass = getCharacterClass(
+            character,
+            typedCharacter,
+            index
+          );
 
           if (character === "\n") {
             return (
@@ -244,7 +247,6 @@ function TypingArea({
                     <span className="typing-caret absolute left-0 top-[0.1em] h-[1em] w-[2px] bg-accent" />
                   </span>
                 )}
-
                 {"\n"}
               </span>
             );
@@ -261,11 +263,20 @@ function TypingArea({
                   aria-hidden="true"
                 />
               )}
-
               {character}
             </span>
           );
         })}
+
+        {isAtEndWithErrors && (
+          <span
+            className="relative inline-block w-[0.15em]"
+            aria-hidden="true"
+            data-testid="end-caret"
+          >
+            <span className="typing-caret absolute left-0 top-1/2 h-[1em] w-[2px] -translate-y-1/2 bg-accent" />
+          </span>
+        )}
       </pre>
     </div>
   );
