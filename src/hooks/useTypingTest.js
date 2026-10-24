@@ -5,6 +5,10 @@ import useLocalStorage from "./useLocalStorage";
 import texts from "../data/texts";
 import javascriptSnippets from "../data/javascriptSnippets";
 import getRandomItem from "../utils/getRandomItem";
+import {
+  calculateAccuracy,
+  calculateWpm,
+} from "../utils/typingStats";
 
 function getContentForMode(mode) {
   if (mode === "javascript") {
@@ -101,21 +105,15 @@ function useTypingTest() {
   const isFinished =
     finished || (timeLeft === 0 && typedText.length > 0);
 
-  const totalKeystrokes = correctKeystrokes + mistakes;
+  const accuracy = calculateAccuracy(
+    correctKeystrokes,
+    mistakes
+  );
 
-  const accuracy =
-    totalKeystrokes > 0
-      ? Math.round(
-          (correctKeystrokes / totalKeystrokes) * 100
-        )
-      : 0;
-
-  const minutes = elapsedTime / 60;
-
-  const wpm =
-    minutes > 0
-      ? Math.round(correctKeystrokes / 5 / minutes)
-      : 0;
+  const wpm = calculateWpm(
+    correctKeystrokes,
+    elapsedTime
+  );
 
   return {
     mode,
