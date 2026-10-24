@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import useTimer from "./useTimer";
 import useLocalStorage from "./useLocalStorage";
 import texts from "../data/texts";
@@ -9,9 +10,7 @@ function getContentForMode(mode) {
   if (mode === "javascript") {
     return {
       mode: "javascript",
-      value: getRandomItem(
-        javascriptSnippets
-      ),
+      value: getRandomItem(javascriptSnippets),
     };
   }
 
@@ -22,30 +21,21 @@ function getContentForMode(mode) {
 }
 
 function useTypingTest() {
-  const [mode, setMode] = useState("text");
+  const [mode, updateMode] = useState("text");
 
-  const [duration, setDuration] =
-    useLocalStorage(
-      "kiflo-duration",
-      30
-    );
+  const [duration, updateDuration] = useLocalStorage(
+    "kiflo-duration",
+    30
+  );
 
-  const [typedText, setTypedText] =
-    useState("");
-
-  const [
-    correctKeystrokes,
-    setCorrectKeystrokes,
-  ] = useState(0);
-
-  const [mistakes, setMistakes] =
+  const [typedText, setTypedText] = useState("");
+  const [correctKeystrokes, setCorrectKeystrokes] =
     useState(0);
+  const [mistakes, setMistakes] = useState(0);
+  const [finished, setFinished] = useState(false);
 
-  const [isFinished, setIsFinished] =
-    useState(false);
-
-  const [content, setContent] = useState(
-    () => getContentForMode("text")
+  const [content, setContent] = useState(() =>
+    getContentForMode("text")
   );
 
   const {
@@ -67,35 +57,27 @@ function useTypingTest() {
       ? content.value
       : null;
 
-  const resetTestState = () => {
+  const resetTestState = (nextDuration = duration) => {
     setTypedText("");
     setCorrectKeystrokes(0);
     setMistakes(0);
-    setIsFinished(false);
-    resetTimer();
+    setFinished(false);
+    resetTimer(nextDuration);
   };
 
-  useEffect(() => {
-    setContent(getContentForMode(mode));
+  const setMode = (newMode) => {
+    if (newMode === mode) return;
+
+    updateMode(newMode);
+    setContent(getContentForMode(newMode));
     resetTestState();
-  }, [mode]);
+  };
 
-  useEffect(() => {
-    resetTestState();
-  }, [duration]);
+  const setDuration = (newDuration) => {
+    if (newDuration === duration) return;
 
-  useEffect(() => {
-    if (
-      timeLeft === 0 &&
-      typedText.length > 0
-    ) {
-      setIsFinished(true);
-    }
-  }, [timeLeft, typedText]);
-
-  const finishTest = () => {
-    stopTimer();
-    setIsFinished(true);
+    updateDuration(newDuration);
+    resetTestState(newDuration);
   };
 
   const restartTest = () => {
@@ -103,27 +85,28 @@ function useTypingTest() {
     resetTestState();
   };
 
+  const finishTest = () => {
+    stopTimer();
+    setFinished(true);
+  };
+
   const registerCorrectKeystroke = () => {
-    setCorrectKeystrokes(
-      (current) => current + 1
-    );
+    setCorrectKeystrokes((current) => current + 1);
   };
 
   const registerMistake = () => {
-    setMistakes(
-      (current) => current + 1
-    );
+    setMistakes((current) => current + 1);
   };
 
-  const totalKeystrokes =
-    correctKeystrokes + mistakes;
+  const isFinished =
+    finished || (timeLeft === 0 && typedText.length > 0);
+
+  const totalKeystrokes = correctKeystrokes + mistakes;
 
   const accuracy =
     totalKeystrokes > 0
       ? Math.round(
-          (correctKeystrokes /
-            totalKeystrokes) *
-            100
+          (correctKeystrokes / totalKeystrokes) * 100
         )
       : 0;
 
@@ -131,11 +114,7 @@ function useTypingTest() {
 
   const wpm =
     minutes > 0
-      ? Math.round(
-          correctKeystrokes /
-            5 /
-            minutes
-        )
+      ? Math.round(correctKeystrokes / 5 / minutes)
       : 0;
 
   return {

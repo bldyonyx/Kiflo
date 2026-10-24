@@ -1,78 +1,117 @@
+
 import { useEffect, useRef, useState } from "react";
 
 function useTimer(duration) {
-  const [timeLeft, setTimeLeft] = useState(duration);
-  const [isRunning, setIsRunning] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [timer, setTimer] = useState({
+    timeLeft: duration,
+    elapsedTime: 0,
+    isRunning: false,
+  });
 
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
+  const runningRef = useRef(false);
 
-  const stopTimer = () => {
-    if (!startTimeRef.current) {
-      return;
+  const clearTimerInterval = () => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
-
-    const elapsed =
-      (Date.now() - startTimeRef.current) / 1000;
-
-    clearInterval(intervalRef.current);
-    setElapsedTime(elapsed);
-    setIsRunning(false);
   };
 
   const startTimer = () => {
-    if (isRunning || timeLeft <= 0) {
+    if (runningRef.current || timer.timeLeft <= 0) {
       return;
     }
 
-    startTimeRef.current = Date.now();
-    setIsRunning(true);
+    runningRef.current = true;
+    startTimeRef.current = performance.now();
+
+    setTimer((current) => ({
+      ...current,
+      isRunning: true,
+    }));
   };
 
-  const resetTimer = () => {
-    clearInterval(intervalRef.current);
-    setTimeLeft(duration);
-    setElapsedTime(0);
-    setIsRunning(false);
+  const stopTimer = () => {
+    if (!runningRef.current || startTimeRef.current === null) {
+      return;
+    }
+
+    const elapsed = Math.min(
+      (performance.now() - startTimeRef.current) / 1000,
+      duration
+    );
+
+    runningRef.current = false;
+    clearTimerInterval();
+
+    setTimer({
+      timeLeft: Math.max(duration - Math.floor(elapsed), 0),
+      elapsedTime: elapsed,
+      isRunning: false,
+    });
+  };
+
+  const resetTimer = (nextDuration = duration) => {
+    runningRef.current = false;
     startTimeRef.current = null;
+    clearTimerInterval();
+
+    setTimer({
+      timeLeft: nextDuration,
+      elapsedTime: 0,
+      isRunning: false,
+    });
   };
 
   useEffect(() => {
-    resetTimer();
-  }, [duration]);
-
-  useEffect(() => {
-    if (!isRunning) {
+    if (!timer.isRunning) {
       return;
     }
 
     intervalRef.current = setInterval(() => {
+      if (startTimeRef.current === null) {
+        return;
+      }
+
       const elapsed =
-        (Date.now() - startTimeRef.current) / 1000;
-
-      const remaining = Math.max(
-        duration - Math.floor(elapsed),
-        0
-      );
-
-      setTimeLeft(remaining);
+        (performance.now() - startTimeRef.current) / 1000;
 
       if (elapsed >= duration) {
-        setElapsedTime(duration);
-        setIsRunning(false);
+        runningRef.current = false;
+        clearTimerInterval();
+
+        setTimer({
+          timeLeft: 0,
+          elapsedTime: duration,
+          isRunning: false,
+        });
+
+        return;
       }
+
+      setTimer((current) => ({
+        ...current,
+        timeLeft: Math.max(
+          duration - Math.floor(elapsed),
+          0
+        ),
+      }));
     }, 100);
 
+    return clearTimerInterval;
+  }, [timer.isRunning, duration]);
+
+  useEffect(() => {
     return () => {
-      clearInterval(intervalRef.current);
+      runningRef.current = false;
+      clearTimerInterval();
     };
-  }, [isRunning, duration]);
+  }, []);
 
   return {
-    timeLeft,
-    isRunning,
-    elapsedTime,
+    ...timer,
     startTimer,
     stopTimer,
     resetTimer,
